@@ -3,35 +3,31 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main {
+    static HashMap<String, Command> commands;
     public static void main(String[] args) {
         Player player = new Player("Joe Shmoe", "Just an ordinary guy.");
+
         Graph g = new Graph();
-        g.addNode("hall", "It's really damp and dark in here");
-        g.addNode("closet", "You are surrounded by an endless sea of nothing");
-        g.addNode("dungeon", "The air is moist and moss covers the cobble stone floor");
-        g.addNode("bedroom", "There is a large bed.");
-        g.addNode("bathroom", "You see a dank shower");
-        //generateNodes(g);
+        generateNodes(g, player);
 
-        g.getNode("hall").addItem(new Item("A Rock", "It looks useless..."));
-        g.addDirectedEdge("hall", "dungeon");
-        g.addUndirected("hall", "closet");
-        g.addUndirected("closet", "bedroom");
-        g.addUndirected("bedroom", "bathroom");
-
-        g.addAnimalInGraph(new Chicken("chicken", "it's a ChIckEn", "bock bock", g.getNode("hall")));
-        g.addAnimalInGraph(new Chicken("chicken", "it's a ChIckEn", "bock bock", g.getNode("hall")));
-        g.addAnimalInGraph(new Chicken("chicken", "it's a ChIckEn", "bock bock", g.getNode("hall")));
-
-        g.addAnimalInGraph(new Wumpus("Wumpus", "WumP WumP", "reeeeeeeeeeeeEEE", g.getNode("hall"), g, player));
-        g.addAnimalInGraph(new PopStar("Popstar", "wryyyyyyyyyyyyyyyy", "Kono DiO", g.getNode("bathroom"), g, player));
-
+        initCommands(g, player);
 
         player.setCurrentLocation(g.getNode("hall"));
+        g.addPlayer(player);
 
         // "game loop" where I get user input and move the player
         String response;
         Scanner in = new Scanner(System.in);
+
+        do {
+            System.out.println("You are currently in the " + player.getCurrentLocation().getName());
+            System.out.println("What do you want to do? ----->");
+            response = in.nextLine();
+            Command command = lookupCommand(response);
+            command.execute();
+
+        }while (!response.equals("quit"));
+
 
         do {
             //display the room and ask the player what they want to do
@@ -115,11 +111,46 @@ public class Main {
 
             ////////////////////////////////////////////////////////////
 
+
+
+            ////////////////////////////////////////////////////////////
             g.updateAllCreatures(g, player);
 
 
             System.out.println("======================================================================================");
         } while (!response.equals("quit"));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private static void initCommands(Graph g, Player p) {
+        commands.put("go", new GoCommand(g));
+        commands.put("take", new TakeCommand(g));
+        commands.put("drop", new DropCommand(g));
+        commands.put("look around", new LookAroundCommand(g));
+        commands.put("inventory", new InventoryCommand(g));
+        commands.put("look at", new LookAtCommand(g));
+        commands.put("add", new AddCommand(g));
+        commands.put("quit", new QuitCommand(g));
+
+
+    }
+
+    private static Command lookupCommand(String response){
+        String commandWord = getFirstWornIn(response);
+        Command c = commands.get(commandWord);
+        if(c == null){
+            return new EmptyCommand();
+        }
+
+        c.init(response);
+
+        return c;
+    }
+
+    private static String getFirstWornIn(String response) {
+        int index = response.indexOf(" ");
+        return response.substring(0,index);
     }
 
     private static String getCurrentLocAnimalNames(Graph.Node currentLocation, Graph g) {
@@ -157,9 +188,25 @@ public class Main {
         return null;
     }
 
-    private static void generateNodes(Graph g) {
+    private static void generateNodes(Graph g, Player player) {
+        g.addNode("hall", "It's really damp and dark in here");
+        g.addNode("closet", "You are surrounded by an endless sea of nothing");
+        g.addNode("dungeon", "The air is moist and moss covers the cobble stone floor");
+        g.addNode("bedroom", "There is a large bed.");
+        g.addNode("bathroom", "You see a dank shower");
 
+        g.getNode("hall").addItem(new Item("A Rock", "It looks useless..."));
+        g.addDirectedEdge("hall", "dungeon");
+        g.addUndirected("hall", "closet");
+        g.addUndirected("closet", "bedroom");
+        g.addUndirected("bedroom", "bathroom");
 
+        g.addAnimalInGraph(new Chicken("chicken", "it's a ChIckEn", "bock bock", g.getNode("hall")));
+        g.addAnimalInGraph(new Chicken("chicken", "it's a ChIckEn", "bock bock", g.getNode("hall")));
+        g.addAnimalInGraph(new Chicken("chicken", "it's a ChIckEn", "bock bock", g.getNode("hall")));
+
+        g.addAnimalInGraph(new Wumpus("Wumpus", "WumP WumP", "reeeeeeeeeeeeEEE", g.getNode("hall"), g, player));
+        g.addAnimalInGraph(new PopStar("Popstar", "wryyyyyyyyyyyyyyyy", "Kono DiO", g.getNode("bathroom"), g, player));
     }
 
     private static String findName(String response) {

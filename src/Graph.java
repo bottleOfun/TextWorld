@@ -1,12 +1,10 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Graph {
     private HashMap<String, Node> nodes;
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<Animal> allAnimals = new ArrayList<>();
+
 
     public Graph() {
         nodes = new HashMap<>();
@@ -109,6 +107,8 @@ public class Graph {
         return path;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public ArrayList<Animal> getAnimalsListInGraph() {
         return allAnimals;
     }
@@ -139,8 +139,43 @@ public class Graph {
 
     public void updateAllCreatures(Graph g, Player p) {
         for (int i = 0; i < g.getAnimalsListInGraph().size(); i++) {
+            Animal temp = g.getAnimalsListInGraph().get(i);
+            if (doesAnimalNeedData(temp)) {
+                String animalType = checkAnimalType(temp);
+                if (animalType.equals("Wumpus"))
+                    ((Wumpus) g.getAnimalsListInGraph().get(i)).updateData(g, p);
+                if (animalType.equals("PopStar"))
+                    ((PopStar) g.getAnimalsListInGraph().get(i)).updateData(g, p);
+            }
             g.getAnimalsListInGraph().get(i).moveToRoom();
+
         }
+    }
+
+    private String checkAnimalType(Animal temp) {
+        if (temp instanceof PopStar) return "PopStar";
+        if (temp instanceof Wumpus) return "Wumpus";
+        return null;
+    }
+
+    private boolean doesAnimalNeedData(Animal temp) {
+        if (temp instanceof PopStar || temp instanceof Wumpus) {
+            return true;
+        }
+        return false;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public ArrayList<Player> getPlayerListInGraph() {
+        return players;
+    }
+
+    public void addPlayer(Player p) {
+        players.add(p);
+    }
+
+    public Player getFirstPlayer() {
+        return players.get(0);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -287,6 +322,12 @@ public class Graph {
             return null;
         }
 
-    }
 
+        public boolean checkForAnimals() {
+            if (animals.size()>0) {
+                return true;
+            }
+            return false;
+        }
+    }
 }

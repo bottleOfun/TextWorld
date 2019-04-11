@@ -42,7 +42,6 @@ public class Player {
 
     public void setCurrentLocation(Graph.Node currentLocation) {
         this.currentLocation = currentLocation;
-
     }
 
     public boolean moveToRoom(String name) {
@@ -138,8 +137,9 @@ public class Player {
         return null;
     }
 
-    public void addToInventory(Item item) {
+    public boolean addToInventory(Item item) {
         inventory.add(item);
+        return true;
     }
 
     public Item removeFromInventory(String itemName) {
