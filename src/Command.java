@@ -3,14 +3,15 @@ public abstract class Command {
     public String name;
     public Graph g;
 
-    public Command(Graph g){
+    public Command(Graph g) {
         this.g = g;
     }
-    public void init(String userString){
+
+    public void init(String userString) {
         this.name = getLastWordIn(userString);
     }
 
-    public String getLastWordIn(String userString){
+    public String getLastWordIn(String userString) {
         if (userString.contains("<") && userString.contains(">")) {
             int start = userString.indexOf("<");
             int end = userString.indexOf(">");

@@ -2,7 +2,7 @@ public class Item {
     private String name, descritpion;
     private double damgageValue, healingValue;
 
-    public Item(String name, String descritpion){
+    public Item(String name, String descritpion) {
         this.name = name;
         this.descritpion = descritpion;
     }

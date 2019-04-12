@@ -3,17 +3,15 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main {
-    static HashMap<String, Command> commands;
+
     public static void main(String[] args) {
         Player player = new Player("Joe Shmoe", "Just an ordinary guy.");
-
         Graph g = new Graph();
         generateNodes(g, player);
-
-        initCommands(g, player);
-
         player.setCurrentLocation(g.getNode("hall"));
         g.addPlayer(player);
+
+        HashMap<String, Command> commands = initCommands(g, player);
 
         // "game loop" where I get user input and move the player
         String response;
@@ -23,107 +21,18 @@ public class Main {
             System.out.println("You are currently in the " + player.getCurrentLocation().getName());
             System.out.println("What do you want to do? ----->");
             response = in.nextLine();
-            Command command = lookupCommand(response);
+            Command command = lookupCommand(response, commands);
             command.execute();
 
-        }while (!response.equals("quit"));
+            System.out.println("========================================================================================\n");
 
-
-        do {
-            //display the room and ask the player what they want to do
-            System.out.println("You are currently in the " + player.getCurrentLocation().getName());
-            System.out.println("What do you want to do? ----->");
-            response = in.nextLine();
-
-            ////////////////////////////////////////////////////////
-            if (response.contains("go")) {
-                String room = findName(response);
-                if (room == null) {
-                    System.out.println("ERROR! Try again.");
-                } else {
-                    if (g.getHashNodes().containsKey(room)) {
-                        player.setCurrentLocation(g.getNode(room));
-                    } else {
-                        System.out.println("ERROR! Try again.");
-                    }
-                }
-                ////////////////////////////////////////////////////////
-            } else if (response.contains("take")) {
-                Item item = findItemName(response, player);
-                if (item == null) {
-                    System.out.println("ERROR! Try again.");
-                } else {
-                    player.addToInventory(item);
-                }
-                ////////////////////////////////////////////////////////
-            } else if (response.contains("drop")) {
-                String itemName = findName(response);
-                Item item = player.removeFromInventory(itemName);
-                if (item == null) {
-                    System.out.println("ERROR! Try again.");
-                } else {
-                    System.out.println("dropped: " + item.getName());
-                    player.getCurrentLocation().addItem(item);
-                }
-                ////////////////////////////////////////////////////////
-            } else if (response.equals("look around")) {
-                System.out.println(player.getCurrentLocation().getDescription());
-                System.out.println("Neighbors are: " + player.getCurrentLocation().getNeighborNames());
-                if (player.getCurrentLocation().getItems().size() != 0) {
-                    System.out.println("You see:" + player.getCurrentLocation().getItemNames() + " laying on the floor");
-                }
-                if (checkForAnimals(player.getCurrentLocation(), g)) {
-                    System.out.println("Woah! a wild:" + getCurrentLocAnimalNames(player.getCurrentLocation(), g) + "!");
-                    for (int i = 0; i < player.getCurrentLocation().getAnimalsListInNode().size(); i++) {
-                        double chanceToSpeak = Math.random();
-                        if(chanceToSpeak >=0.5){
-                            System.out.println(player.getCurrentLocation().getAnimalsListInNode().get(i).getToPlayerDialogue());
-                        }
-                    }
-                }
-                ////////////////////////////////////////////////////////
-            } else if (response.equals("inventory")) {
-                System.out.println(player.getInventory());
-                ////////////////////////////////////////////////////////
-            } else if (response.contains("look at")) {
-                String itemName = findName(response);
-                if (player.getItemFromInventory(itemName) == null) {
-                    System.out.println("ERROR! Try again.");
-                } else {
-                    Item item = player.getItemFromInventory(itemName);
-                    System.out.println("Description: " + item.getDescritpion());
-                }
-                ////////////////////////////////////////////////////////
-            } else if (response.contains("add")) {
-                String room = findName(response);
-                if (room != null) {
-                    g.addDirectedEdge(player.getCurrentLocation().getName(), room);
-                } else {
-                    System.out.println("ERROR! Try again.");
-                }
-                ////////////////////////////////////////////////////////
-            } else if (response.equals("quit")) {
-                System.out.println("you quit :(");
-                break;
-            } else {
-                System.out.println("error! commands are: 'go <roomname>', 'take <itemname>, 'drop <itemName>',\n 'look around', 'inventory', 'look at <itemname> 'add <roomname>', 'quit'");
-            }
-
-            ////////////////////////////////////////////////////////////
-
-
-
-            ////////////////////////////////////////////////////////////
             g.updateAllCreatures(g, player);
-
-
-            System.out.println("======================================================================================");
         } while (!response.equals("quit"));
     }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static void initCommands(Graph g, Player p) {
+    private static HashMap<String, Command> initCommands(Graph g, Player p) {
+        HashMap<String, Command> commands = new HashMap<>();
         commands.put("go", new GoCommand(g));
         commands.put("take", new TakeCommand(g));
         commands.put("drop", new DropCommand(g));
@@ -132,15 +41,19 @@ public class Main {
         commands.put("look at", new LookAtCommand(g));
         commands.put("add", new AddCommand(g));
         commands.put("quit", new QuitCommand(g));
-
+        commands.put("", new EmptyCommand(g));
+        return commands;
 
     }
 
-    private static Command lookupCommand(String response){
-        String commandWord = getFirstWornIn(response);
+    private static Command lookupCommand(String response, HashMap<String, Command> commands) {
+        String commandWord = response;
+        if (!response.contains("look")) {
+            commandWord = getFirstWornIn(response);
+        }
         Command c = commands.get(commandWord);
-        if(c == null){
-            return new EmptyCommand();
+        if (c == null) {
+            return commands.get("");
         }
 
         c.init(response);
@@ -149,8 +62,12 @@ public class Main {
     }
 
     private static String getFirstWornIn(String response) {
-        int index = response.indexOf(" ");
-        return response.substring(0,index);
+        if (response.contains(" ")) {
+            int index = response.indexOf(" ");
+            return response.substring(0, index);
+        } else {
+            return response;
+        }
     }
 
     private static String getCurrentLocAnimalNames(Graph.Node currentLocation, Graph g) {

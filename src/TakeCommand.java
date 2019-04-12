@@ -5,12 +5,12 @@ public class TakeCommand extends Command {
     Player p;
     String itemName;
 
-    public TakeCommand(Graph g){
+    public TakeCommand(Graph g) {
         super(g);
         this.p = g.getFirstPlayer();
     }
 
-    public void init(String userString){
+    public void init(String userString) {
         this.itemName = getLastWordIn(userString);
     }
 
@@ -29,9 +29,9 @@ public class TakeCommand extends Command {
     @Override
     public void execute() {
         Item item = findItem(p);
-        if(item != null) {
+        if (item != null) {
             g.getFirstPlayer().addToInventory(item);
-        }else{
+        } else {
             System.out.println("ERROR!");
         }
     }

@@ -7,7 +7,7 @@ public abstract class Animal {
     protected String name, description, toPlayerDialogue;
     protected Player master;
 
-    public Animal(String name, String description, String toPlayerDialogue, Graph.Node currentLocation){
+    public Animal(String name, String description, String toPlayerDialogue, Graph.Node currentLocation) {
         this.name = name;
         this.description = description;
         this.toPlayerDialogue = toPlayerDialogue;
@@ -16,11 +16,11 @@ public abstract class Animal {
 
     public abstract void moveToRoom();
 
-    public Graph.Node getCurrentLocation(){
+    public Graph.Node getCurrentLocation() {
         return currentLocation;
     }
 
-    public void speak(String playerName){
+    public void speak(String playerName) {
         System.out.println(toPlayerDialogue);
     }
 
@@ -76,7 +76,7 @@ public abstract class Animal {
         this.toPlayerDialogue = toPlayerDialogue;
     }
 
-    public Player getMaster(){
+    public Player getMaster() {
         return master;
     }
 

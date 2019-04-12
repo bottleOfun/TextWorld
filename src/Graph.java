@@ -324,7 +324,7 @@ public class Graph {
 
 
         public boolean checkForAnimals() {
-            if (animals.size()>0) {
+            if (animals.size() > 0) {
                 return true;
             }
             return false;

@@ -102,14 +102,14 @@ public class Player {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public Animal getPet(){
-        if(pet == null){
+    public Animal getPet() {
+        if (pet == null) {
             System.out.println("you don't have a pet");
         }
         return pet;
     }
 
-    public void setPet(Animal pet){
+    public void setPet(Animal pet) {
         this.pet = pet;
     }
 

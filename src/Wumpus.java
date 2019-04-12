@@ -8,10 +8,10 @@ public class Wumpus extends Animal {
     public Wumpus(String name, String description, String toPlayerDialogue, Graph.Node currentLocation, Graph g, Player p) {
         super(name, description, toPlayerDialogue, currentLocation);
         currentLocation.addAnimalInNode(this);
-        updateData(g,p);
+        updateData(g, p);
     }
 
-    public void updateData(Graph g, Player p){
+    public void updateData(Graph g, Player p) {
         this.g = g;
         this.p = p;
     }
